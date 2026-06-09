@@ -1,36 +1,10 @@
 {
   "winner": "RAW",
-  "why": "Raw SQL is ~0.05ms faster per query. Doesn't matter for most apps \u2014 both are fine.",
-  "details": {
-    "raw  EmployeeService": {
-      "avg_ms": 0.219,
-      "min_ms": 0.201,
-      "max_ms": 0.328,
-      "runs": 950
-    },
-    "orm  EmployeeORMService": {
-      "avg_ms": 0.274,
-      "min_ms": 0.241,
-      "max_ms": 0.45,
-      "runs": 950
-    },
-    "raw  LocationService": {
-      "avg_ms": 0.211,
-      "min_ms": 0.189,
-      "max_ms": 0.42,
-      "runs": 950
-    },
-    "orm  LocationORMService": {
-      "avg_ms": 0.297,
-      "min_ms": 0.276,
-      "max_ms": 0.652,
-      "runs": 950
-    }
-  },
-  "summary": [
-    "raw  EmployeeService: avg 0.219ms (range 0.201-0.328ms, 950 runs)",
-    "orm  EmployeeORMService: avg 0.274ms (range 0.241-0.45ms, 950 runs)",
-    "raw  LocationService: avg 0.211ms (range 0.189-0.42ms, 950 runs)",
-    "orm  LocationORMService: avg 0.297ms (range 0.276-0.652ms, 950 runs)"
-  ]
+  "why": "Raw SQL avg 0.221ms vs ORM 0.269ms - barely any difference",
+  "results": {
+    "raw  EmployeeService": 0.221,
+    "orm  EmployeeORMService": 0.269,
+    "raw  LocationService": 0.209,
+    "orm  LocationORMService": 0.315
+  }
 }
