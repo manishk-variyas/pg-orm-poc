@@ -1,7 +1,6 @@
-"""
-Simple benchmark: run each query 1000 times, compare raw vs orm.
-Saves results to benchmark.json.
-"""
+# benchmark.py
+# Runs each query 1000 times, compares raw SQL vs ORM speed.
+# Saves results to benchmark.json so you can decide which to use.
 
 import json
 import time
@@ -14,22 +13,24 @@ from app.services.employee_orm import EmployeeORMService
 from app.services.location import LocationService
 from app.services.location_orm import LocationORMService
 
-N = 1000
-fake_id = uuid4()
+N = 1000               # how many times to run each query
+fake_id = uuid4()      # random ID that doesn't exist in DB
 results: dict[str, dict] = {}
 
 
 def bench(label: str, service_cls, method: str, *args):
+    # Create a service, run the query N times, record each time
     times = []
     for _ in range(N):
         db = SessionLocal()
         svc = service_cls(db)
-        t0 = time.perf_counter()
+        start = time.perf_counter()
         getattr(svc, method)(*args)
-        times.append(time.perf_counter() - t0)
+        times.append(time.perf_counter() - start)
         db.close()
 
-    times = times[50:]  # drop warm-up
+    times = times[50:]  # throw away first 50 (cold start / warm-up)
+
     avg = statistics.mean(times) * 1000
     low = min(times) * 1000
     high = max(times) * 1000
@@ -56,20 +57,14 @@ print("\n── get_all ──")
 bench("raw  LocationService", LocationService, "get_all")
 bench("orm  LocationORMService", LocationORMService, "get_all")
 
-# Add a readable summary
-summary_lines = []
-for label, data in results.items():
-    summary_lines.append(
-        f"{label}: avg {data['avg_ms']}ms "
-        f"(range {data['min_ms']}-{data['max_ms']}ms, {data['runs']} runs)"
-    )
-
 report = {
     "winner": "RAW",
-    "why": "Raw SQL is ~0.05ms faster per query. "
-           "Doesn't matter for most apps — both are fine.",
+    "why": "Raw SQL wins by ~0.05ms per query. Doesn't matter for most apps.",
     "details": results,
-    "summary": summary_lines,
+    "summary": [
+        f"{k}: avg {v['avg_ms']}ms (range {v['min_ms']}-{v['max_ms']}ms, {v['runs']} runs)"
+        for k, v in results.items()
+    ],
 }
 
 with open("benchmark.json", "w") as f:
